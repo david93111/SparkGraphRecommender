@@ -6,6 +6,12 @@ version := "0.1"
 
 scalaVersion := "2.11.8"
 
+resolvers ++= Seq(
+  "anormcypher" at "http://repo.anormcypher.org/",
+  "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+  "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven"
+)
+
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "com.typesafe.akka" %% "akka-http" % "10.0.10",
@@ -13,6 +19,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.19",
   "org.apache.spark" % "spark-core_2.11" % "2.2.0",
   "org.apache.spark" % "spark-mllib_2.11" % "2.2.0",
+  "org.anormcypher" %% "anormcypher" % "0.10.0",
+  "neo4j-contrib" % "neo4j-spark-connector" % "2.0.0-M2",
   "ch.qos.logback" % "logback-classic" % "1.1.6"
 )
 
