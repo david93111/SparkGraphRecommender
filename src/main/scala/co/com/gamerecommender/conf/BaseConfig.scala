@@ -1,6 +1,6 @@
 package co.com.gamerecommender.conf
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 
 object BaseConfig {
 

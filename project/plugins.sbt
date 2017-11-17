@@ -2,7 +2,7 @@ logLevel := Level.Warn
 
 resolvers += Classpaths.typesafeReleases
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.1")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.0.0")
 
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 

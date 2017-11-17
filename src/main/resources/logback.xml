@@ -1,0 +1,35 @@
+<configuration>
+
+    <property name="APP_NAME" value="game-recommender" />
+    <property name="LOG_PATH" value="logs" />
+
+    <property name="NAME_APP_MODULE" value="spark-ms[ ${APP_NAME} ]" />
+    <property name="APP_MODULE" value="${APP_NAME}#GLOBAL" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%magenta(%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, America/Bogota}) %highlight(%-5level[%.15thread]) %yellow(%logger{36}) %green(${APP_MODULE}) %C{15} %cyan(%line) %white(%msg%n)
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- <queueSize>512</queueSize>  -->
+        <appender-ref ref="CONSOLE" />
+    </appender>
+
+
+    <logger name="akka" level="ERROR"/>
+    <logger name="spark" level="ERROR"/>
+
+
+    <logger name="LOGGING" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </logger>
+
+
+    <root level="INFO">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </root>
+
+</configuration>
