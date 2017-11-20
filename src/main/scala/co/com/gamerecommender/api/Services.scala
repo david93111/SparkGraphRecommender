@@ -3,7 +3,11 @@ package co.com.gamerecommender.api
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.{ ALS, MatrixFactorizationModel, Rating }
 
+import scala.concurrent.ExecutionContext
+
 trait Services {
+
+  implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
 
   def calculateALS(sc: SparkContext): MatrixFactorizationModel = {
 
