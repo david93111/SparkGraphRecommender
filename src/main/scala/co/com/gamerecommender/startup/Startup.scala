@@ -11,6 +11,7 @@ import co.com.gamerecommender.api.Api
 import co.com.gamerecommender.conf.BaseConfig
 import com.typesafe.config.Config
 import org.apache.spark.{ SparkConf, SparkContext }
+import org.neo4j.spark.Neo4j
 
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor, Future }
@@ -36,7 +37,7 @@ object Startup {
       implicit val executionContext: ExecutionContext = Context.defaultDispatcher
 
       val sparkContext: SparkContext = sc
-
+      val neo: Neo4j = Neo4j(sparkContext)
     }
 
     implicit val ec: ExecutionContextExecutor = system.dispatcher
@@ -48,6 +49,7 @@ object Startup {
 
     bindingFuture.map { serverBinding =>
       log.info(s"Server Started on ${serverBinding.localAddress} ")
+      //log.info("the bolt URL is ->" + conf.get("spark.neo4j.bolt.url"))
       system.registerOnTermination {
         sc.stop()
       }

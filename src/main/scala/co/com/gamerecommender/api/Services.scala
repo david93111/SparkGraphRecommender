@@ -2,6 +2,9 @@ package co.com.gamerecommender.api
 
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.{ ALS, Rating }
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+import org.neo4j.spark.Neo4j
 
 import scala.concurrent.ExecutionContext
 
@@ -10,6 +13,7 @@ trait Services {
   implicit val executionContext: ExecutionContext
 
   val sparkContext: SparkContext
+  val neo: Neo4j
 
   def calculateALS(): Unit = {
 
@@ -52,10 +56,7 @@ trait Services {
   }
 
   def processNeo4j(): Unit = {
-    import org.neo4j.spark._
-    val conf: Neo4jConfig = Neo4jConfig.apply("localhost:7687", "neo4j", Some("admin"))
-    val neo = Neo4j(sparkContext)
-    val rowRDD = neo.cypher("MATCH (n:Person) RETURN n.name as name limit 4").loadRowRdd
+    val rowRDD: RDD[Row] = neo.cypher("MATCH (n:Person) RETURN n.name as name limit 5").loadRowRdd
     rowRDD.map(t => "Name: " + t(0)).collect.foreach(println)
   }
 
