@@ -6,7 +6,7 @@ import akka.http.scaladsl.server._
 
 import scala.concurrent.Future
 
-trait Api extends Services {
+trait Api extends Services with GraphServices {
 
   def apiRoute: Route = pathPrefix("recommender") {
     path("ping") {
@@ -21,7 +21,7 @@ trait Api extends Services {
     } ~ path("calculateALS") {
       pathEndOrSingleSlash {
         get {
-          calculateALS
+          calculateALS()
           complete(OK, "OK")
 
         }
@@ -30,6 +30,7 @@ trait Api extends Services {
       pathEndOrSingleSlash {
         get {
           processNeo4j()
+          testNeoDriver()
           complete(OK, "OK")
 
         }
