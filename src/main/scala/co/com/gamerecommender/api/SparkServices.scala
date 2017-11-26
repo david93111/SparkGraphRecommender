@@ -8,12 +8,12 @@ import org.neo4j.spark.Neo4j
 
 import scala.concurrent.ExecutionContext
 
-trait Services {
+trait SparkServices {
 
   implicit val executionContext: ExecutionContext
 
   val sparkContext: SparkContext
-  val neo: Neo4j
+  val neoSpark: Neo4j
 
   def calculateALS(): Unit = {
 
@@ -56,7 +56,7 @@ trait Services {
   }
 
   def processNeo4j(): Unit = {
-    val rowRDD: RDD[Row] = neo.cypher("MATCH (n:Person) RETURN n.name as name limit 5").loadRowRdd
+    val rowRDD: RDD[Row] = neoSpark.cypher("MATCH (n:Person) RETURN n.name as name limit 5").loadRowRdd
     rowRDD.map(t => "Name: " + t(0)).collect.foreach(println)
   }
 

@@ -37,7 +37,7 @@ object Startup {
       implicit val executionContext: ExecutionContext = Context.defaultDispatcher
 
       val sparkContext: SparkContext = sc
-      val neo: Neo4j = Neo4j(sparkContext)
+      val neoSpark: Neo4j = Neo4j(sparkContext)
     }
 
     implicit val ec: ExecutionContextExecutor = system.dispatcher

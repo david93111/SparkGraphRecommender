@@ -6,7 +6,7 @@ import akka.http.scaladsl.server._
 
 import scala.concurrent.Future
 
-trait Api extends Services with GraphServices {
+trait Api extends SparkServices with GraphServices {
 
   def apiRoute: Route = pathPrefix("recommender") {
     path("ping") {

@@ -10,5 +10,4 @@ trait GraphServices {
     result
   }
 
-
 }
