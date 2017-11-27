@@ -10,6 +10,7 @@ import akka.util.Timeout
 import co.com.gamerecommender.api.Api
 import co.com.gamerecommender.conf.BaseConfig
 import com.typesafe.config.Config
+import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
 import org.apache.spark.{ SparkConf, SparkContext }
 import org.neo4j.spark.Neo4j
 
@@ -38,6 +39,8 @@ object Startup {
 
       val sparkContext: SparkContext = sc
       val neoSpark: Neo4j = Neo4j(sparkContext)
+
+      val model: MatrixFactorizationModel = trainModel()
     }
 
     implicit val ec: ExecutionContextExecutor = system.dispatcher

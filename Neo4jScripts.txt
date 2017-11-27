@@ -1,0 +1,6 @@
+MATCH(a:GAME{name:"Paladins"})
+MATCH(u:USER{username:"davidv"})
+CREATE (u)-[like:LIKES]->(a)
+CREATE (u)-[rate:RATES{dateMilis:1511730136583,rate:5.0}]->(a)
+return a,u,like,rate
+

@@ -18,6 +18,11 @@ trait Api extends SparkServices with GraphServices {
 
         }
       }
+    } ~ path("games") {
+      get {
+        getRecomendedProducts()
+        complete(OK, "recommended products")
+      }
     } ~ path("calculateALS") {
       pathEndOrSingleSlash {
         get {
@@ -29,7 +34,7 @@ trait Api extends SparkServices with GraphServices {
     } ~ path("testNeo4j") {
       pathEndOrSingleSlash {
         get {
-          processNeo4j()
+          testProcessNeo4j()
           testNeoDriver()
           complete(OK, "OK")
 

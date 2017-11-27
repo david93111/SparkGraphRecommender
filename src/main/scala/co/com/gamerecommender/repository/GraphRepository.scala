@@ -1,13 +1,20 @@
 package co.com.gamerecommender.repository
 
+import java.util
+
 import co.com.gamerecommender.conf.BaseConfig
+import org.apache.spark.mllib.recommendation.{ ALS, Rating }
 import org.neo4j.driver.v1._
+
+import collection.JavaConverters._
 
 trait GraphRepository {
 
   val neoDriver: Driver
 
   def allGamesWithRating()
+
+  def getAllRatings()
 
   def gameWithRating(gameId: Int)
 
@@ -53,7 +60,7 @@ object GraphRepository extends GraphRepository {
     println("statement is ->" + statement)
     val queryResult = executeReadTx(statement, func)
     println("Node Value -> " + queryResult)
-    
+
     queryResult.get(0).asMap().toString
   }
 
@@ -63,5 +70,22 @@ object GraphRepository extends GraphRepository {
 
   override def gameWithRating(gameId: Int): Unit = {
 
+  }
+
+  override def getAllRatings(): Unit = {
+    val statement = new Statement(
+      """
+        |MATCH (u:USER)-[r:RATES]->(g:GAME)
+        |return id(u) as user,r.rate as rating,id(g) as game
+      """.stripMargin)
+    val func = (r: StatementResult) => {
+      val record: Seq[Record] = r.list().asScala
+
+      val ratings: Seq[Rating] = record.map { row =>
+        val map = row.asMap()
+        Rating(row.get(0).asInt(), row.get(1).asInt(), row.get(2).asDouble())
+      }
+
+    }
   }
 }
