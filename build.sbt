@@ -8,8 +8,11 @@ scalaVersion := "2.11.8"
 
 resolvers ++= Seq(
   "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
-  "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven"
+  "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven",
+  Resolver.bintrayRepo("hseeberger", "maven")
 )
+
+val circeVersion = "0.8.0"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
@@ -25,8 +28,15 @@ libraryDependencies ++= Seq(
   // Neo4J
   "neo4j-contrib" % "neo4j-spark-connector" % "2.1.0-M4",
   "org.neo4j.driver" % "neo4j-java-driver" % "1.4.5",
-  "ch.qos.logback" % "logback-classic" % "1.1.6"
+  "ch.qos.logback" % "logback-classic" % "1.1.6",
+  "de.heikoseeberger" %% "akka-http-circe" % "1.18.1"
 )
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
 
 lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin)

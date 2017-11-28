@@ -1,12 +1,10 @@
 package co.com.gamerecommender.repository
 
-import java.util
-
 import co.com.gamerecommender.conf.BaseConfig
-import org.apache.spark.mllib.recommendation.{ ALS, Rating }
+import co.com.gamerecommender.model.Game
 import org.neo4j.driver.v1._
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 trait GraphRepository {
 
@@ -19,7 +17,6 @@ trait GraphRepository {
   def gameWithRating(gameId: Int)
 
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
-    neoDriver.session()
     val session = neoDriver.session()
     val result: T = session.readTransaction(new TransactionWork[T]() {
       override def execute(transaction: Transaction): T = {
@@ -31,7 +28,6 @@ trait GraphRepository {
   }
 
   protected def executeWriteTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
-    neoDriver.session()
     val session = neoDriver.session()
     val result: T = session.writeTransaction(new TransactionWork[T]() {
       override def execute(transaction: Transaction): T = {
@@ -39,6 +35,12 @@ trait GraphRepository {
         applyFun(stResult)
       }
     })
+    result
+  }
+
+  protected def executeQuery(query: Statement): StatementResult = {
+    val session = neoDriver.session()
+    val result = session.run(query)
     result
   }
 
@@ -64,6 +66,18 @@ object GraphRepository extends GraphRepository {
     queryResult.get(0).asMap().toString
   }
 
+  def getGamesIn(gamesIds: Seq[Long]): Seq[Game] = {
+    val params = Map[String, Object]("gamesIds" -> gamesIds.asJava).asJava
+    val statement = new Statement(
+      "MATCH (g:GAME) WHERE id(g) IN {gamesIds} RETURN g.name as name, g.rate as rate,g.company as company, g.year as year",
+      params)
+    val result = executeQuery(statement)
+    val resultList: Seq[Record] = result.list().asScala
+    val games = resultList.map(record =>
+      Game(record))
+    games
+  }
+
   override def allGamesWithRating(): Unit = {
 
   }
@@ -76,15 +90,10 @@ object GraphRepository extends GraphRepository {
     val statement = new Statement(
       """
         |MATCH (u:USER)-[r:RATES]->(g:GAME)
-        |return id(u) as user,r.rate as rating,id(g) as game
+        |return u.username as user,r.rate as rating,g.name as game
       """.stripMargin)
     val func = (r: StatementResult) => {
       val record: Seq[Record] = r.list().asScala
-
-      val ratings: Seq[Rating] = record.map { row =>
-        val map = row.asMap()
-        Rating(row.get(0).asInt(), row.get(1).asInt(), row.get(2).asDouble())
-      }
 
     }
   }

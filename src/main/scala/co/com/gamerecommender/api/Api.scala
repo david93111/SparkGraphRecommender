@@ -7,6 +7,10 @@ import akka.http.scaladsl.server._
 import scala.concurrent.Future
 
 trait Api extends SparkServices with GraphServices {
+  // Dont delete if is seen as unused, is required for codec entities derivation
+
+  import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+  import io.circe.generic.auto._
 
   def apiRoute: Route = pathPrefix("recommender") {
     path("ping") {
@@ -20,15 +24,8 @@ trait Api extends SparkServices with GraphServices {
       }
     } ~ path("games") {
       get {
-        getRecomendedProducts()
-        complete(OK, "recommended products")
-      }
-    } ~ path("calculateALS") {
-      pathEndOrSingleSlash {
-        get {
-          calculateALS()
-          complete(OK, "OK")
-
+        onSuccess(getRecomendedProducts()) { games =>
+          complete(OK, games)
         }
       }
     } ~ path("testNeo4j") {
@@ -37,7 +34,6 @@ trait Api extends SparkServices with GraphServices {
           testProcessNeo4j()
           testNeoDriver()
           complete(OK, "OK")
-
         }
       }
     }
