@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import co.com.gamerecommender.api.Api
@@ -19,9 +18,8 @@ import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor, Future }
 
 object Startup {
 
-  val config = BaseConfig.conf
-  implicit def requestTimeout: Timeout = configuredRequestTimeout(config)
-  implicit val system = Context.actorSystem
+  implicit def requestTimeout: Timeout = configuredRequestTimeout(BaseConfig.conf)
+  implicit val system: ActorSystem = Context.actorSystem
   val log = Logging(system.eventStream, "akka_project")
 
   def main(args: Array[String]) {
@@ -46,7 +44,7 @@ object Startup {
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val host = system.settings.config.getString("http.host")
     val port = system.settings.config.getInt("http.port")
-    implicit val materializer = ActorMaterializer()
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
     val bindingFuture: Future[ServerBinding] =
       Http().bindAndHandle(api.apiRoute, host, port)
 
