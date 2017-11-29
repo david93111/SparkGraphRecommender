@@ -1,7 +1,7 @@
 package co.com.gamerecommender.repository
 
 import co.com.gamerecommender.conf.BaseConfig
-import co.com.gamerecommender.model.Game
+import co.com.gamerecommender.model.{ Game, User }
 import org.neo4j.driver.v1._
 
 import scala.collection.JavaConverters._
@@ -10,13 +10,9 @@ trait GraphRepository {
 
   val neoDriver: Driver
 
-  def allGamesWithRating()
-
-  def getAllRatings()
-
-  def gameWithRating(gameId: Int)
-
   def getGamesIn(gamesIds: Seq[Long]): Seq[Game]
+
+  def getUserByUserName(username: String): Option[User]
 
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
@@ -79,23 +75,11 @@ object GraphRepository extends GraphRepository {
     games
   }
 
-  override def allGamesWithRating(): Unit = {
-
-  }
-
-  override def gameWithRating(gameId: Int): Unit = {
-
-  }
-
-  override def getAllRatings(): Unit = {
-    val statement = new Statement(
-      """
-        |MATCH (u:USER)-[r:RATES]->(g:GAME)
-        |return u.username as user,r.rate as rating,g.name as game
-      """.stripMargin)
-    val func = (r: StatementResult) => {
-      val record: Seq[Record] = r.list().asScala
-
-    }
+  override def getUserByUserName(username: String): Option[User] = {
+    val params = Map[String, Object]("username" -> username).asJava
+    val statement = new Statement("MATCH (user:USER{username: {username} }) return user", params)
+    val result = executeQuery(statement)
+    val record = result.list().asScala.headOption
+    record.map(User(_))
   }
 }

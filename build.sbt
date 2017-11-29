@@ -14,6 +14,12 @@ resolvers ++= Seq(
 
 val circeVersion = "0.8.0"
 
+val circeDependencies = Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   // AKKA
@@ -29,14 +35,11 @@ libraryDependencies ++= Seq(
   "neo4j-contrib" % "neo4j-spark-connector" % "2.1.0-M4",
   "org.neo4j.driver" % "neo4j-java-driver" % "1.4.5",
   "ch.qos.logback" % "logback-classic" % "1.1.6",
-  "de.heikoseeberger" %% "akka-http-circe" % "1.18.1"
+  "de.heikoseeberger" %% "akka-http-circe" % "1.18.1",
+  "com.jason-goodwin" %% "authentikat-jwt"     % "0.4.0"
 )
 
-libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core",
-  "io.circe" %% "circe-generic",
-  "io.circe" %% "circe-parser"
-).map(_ % circeVersion)
+libraryDependencies ++= circeDependencies
 
 lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
