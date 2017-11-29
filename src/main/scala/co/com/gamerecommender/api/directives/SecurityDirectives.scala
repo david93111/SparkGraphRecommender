@@ -17,7 +17,7 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 trait SecurityDirectives extends SecurityCodecs {
 
   private val tokenExpiryPeriodInDays = 1
-  private val secretKey = "you_shall_not_guess_this"
+  private val secretKey = "you_shall_not_guess_this_but_if_you_guess_it_be_kind"
   private val header = JwtHeader("HS256")
 
   protected def login: Route = post {
@@ -57,7 +57,8 @@ trait SecurityDirectives extends SecurityCodecs {
         complete(StatusCodes.Unauthorized -> "Token expired.")
       case Some(jwt) if JsonWebToken.validate(jwt, secretKey) =>
         provide(getClaims(jwt).getOrElse(Map.empty[String, Any]))
-      case _ => complete(StatusCodes.Unauthorized -> "Authentication invalid, or none where provided")
+      case _ =>
+        complete(StatusCodes.Unauthorized -> "Authentication invalid, or none where provided")
     }
 
   private def isTokenExpired(jwt: String): Boolean = getClaims(jwt) match {
