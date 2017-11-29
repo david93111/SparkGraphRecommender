@@ -27,7 +27,7 @@ trait SecurityDirectives extends SecurityCodecs {
         user.fold[Route](
           complete(StatusCodes.Unauthorized, "Authentication failed, User not found")) { usr =>
             if (validateUser(usr, username, pass)) {
-              val claims = setClaims(username, tokenExpiryPeriodInDays)
+              val claims = setClaims(username, usr.id, tokenExpiryPeriodInDays)
               respondWithHeader(RawHeader("Access-Token", JsonWebToken(header, claims, secretKey))) {
                 complete(StatusCodes.OK, "Token generated")
               }
@@ -42,13 +42,12 @@ trait SecurityDirectives extends SecurityCodecs {
     (user.username == username) && (user.pass == pass)
   }
 
-  private def setClaims(username: String, expiryPeriodInDays: Long) = {
+  private def setClaims(username: String, userId: Long, expiryPeriodInDays: Long) = {
     JwtClaimsSet(
       Map(
         "user" -> username,
-        "expiresAt" -> (System.currentTimeMillis() + TimeUnit.DAYS.toMillis(expiryPeriodInDays))
-      )
-    )
+        "userID" -> userId,
+        "expiresAt" -> (System.currentTimeMillis() + TimeUnit.DAYS.toMillis(expiryPeriodInDays))))
   }
 
   protected def authenticated: Directive1[Map[String, Any]] =
@@ -60,6 +59,24 @@ trait SecurityDirectives extends SecurityCodecs {
       case _ =>
         complete(StatusCodes.Unauthorized -> "Authentication invalid, or none where provided")
     }
+
+  protected def obtainUserName(map: Map[String, Any]): Directive1[String] = {
+    val user = map.get("user")
+    user match {
+      case Some(username: String) => provide(username)
+      case _ =>
+        complete(StatusCodes.NotFound, "Could not retrieve user information for token")
+    }
+  }
+
+  protected def obtainUserId(map: Map[String, Any]): Directive1[Long] = {
+    val user = map.get("userID")
+    user match {
+      case Some(userId: String) => provide(userId.toLong)
+      case _ =>
+        complete(StatusCodes.NotFound, "Could not retrieve user information for token")
+    }
+  }
 
   private def isTokenExpired(jwt: String): Boolean = getClaims(jwt) match {
     case Some(claims) =>

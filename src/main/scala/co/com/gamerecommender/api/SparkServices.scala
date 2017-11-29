@@ -17,7 +17,7 @@ trait SparkServices extends Services {
   val model: MatrixFactorizationModel
 
   def testProcessNeo4j(): Unit = {
-    val rowRDD: RDD[Row] = neoSpark.cypher("MATCH (n:Person) RETURN n.name as name limit 5").loadRowRdd
+    val rowRDD: RDD[Row] = neoSpark.cypher("MATCH (n:USER) RETURN n.name as name limit 1").loadRowRdd
     val a: Unit = rowRDD.map(t => "Name: " + t(0)).collect.foreach(println)
   }
 

@@ -56,7 +56,7 @@ object GraphRepository extends GraphRepository {
       println("result row " + record)
       record.values()
     }
-    val statement = new Statement("""MATCH(u:USER{username:"davidv"}) return u,id(u)""")
+    val statement = new Statement("""MATCH(u:USER) return u,id(u) limit 1""")
     println("statement is ->" + statement)
     val queryResult = executeReadTx(statement, func)
     println("Node Value -> " + queryResult)
@@ -77,7 +77,7 @@ object GraphRepository extends GraphRepository {
 
   override def getUserByUserName(username: String): Option[User] = {
     val params = Map[String, Object]("username" -> username).asJava
-    val statement = new Statement("MATCH (user:USER{username: {username} }) return user", params)
+    val statement = new Statement("MATCH (user:USER{username: {username} }) return user ,id(user) as id", params)
     val result = executeQuery(statement)
     val record = result.list().asScala.headOption
     record.map(User(_))

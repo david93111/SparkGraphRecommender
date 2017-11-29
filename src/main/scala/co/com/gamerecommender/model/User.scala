@@ -2,7 +2,7 @@ package co.com.gamerecommender.model
 
 import org.neo4j.driver.v1.{ Record, Value }
 
-case class User(username: String, pass: String, name: String, country: String, age: Int, genre: String)
+case class User(username: String, pass: String, name: String, country: String, age: Int, genre: String, id: Long)
 
 object User {
   def apply(record: Record): User = {
@@ -13,6 +13,7 @@ object User {
       node.get("name").asString(),
       node.get("country").asString(),
       node.get("age").asInt(),
-      node.get("genre").asString())
+      node.get("genre").asString(),
+      record.get("id").asLong())
   }
 }

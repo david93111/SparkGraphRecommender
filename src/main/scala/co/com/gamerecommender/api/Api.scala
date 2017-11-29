@@ -24,18 +24,23 @@ trait Api extends SecurityDirectives with SparkServices with GraphServices {
       login
     } ~ path("games") {
       get {
-        authenticated { aut =>
-          onSuccess(getRecomendedProductsForUser(5)) { games =>
-            complete(OK, games)
+        authenticated { auth =>
+          println("the auth is " + auth)
+          obtainUserId(auth) { user =>
+            onSuccess(getRecomendedProductsForUser(user.toInt)) { games =>
+              complete(OK, games)
+            }
           }
         }
       }
     } ~ path("testNeo4j") {
       pathEndOrSingleSlash {
         get {
-          testProcessNeo4j()
-          testNeoDriver()
-          complete(OK, "OK")
+          authenticated { _ =>
+            testProcessNeo4j()
+            testNeoDriver()
+            complete(OK, "OK")
+          }
         }
       }
     }
