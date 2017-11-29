@@ -25,9 +25,8 @@ trait Api extends SecurityDirectives with SparkServices with GraphServices {
     } ~ path("games") {
       get {
         authenticated { auth =>
-          println("the auth is " + auth)
           obtainUserId(auth) { user =>
-            onSuccess(getRecomendedProductsForUser(user.toInt)) { games =>
+            onSuccess(getRecomendedProductsForUser(user)) { games =>
               complete(OK, games)
             }
           }

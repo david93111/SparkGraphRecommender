@@ -69,10 +69,10 @@ trait SecurityDirectives extends SecurityCodecs {
     }
   }
 
-  protected def obtainUserId(map: Map[String, Any]): Directive1[Long] = {
+  protected def obtainUserId(map: Map[String, Any]): Directive1[Int] = {
     val user = map.get("userID")
     user match {
-      case Some(userId: String) => provide(userId.toLong)
+      case Some(userId: String) => provide(userId.toInt)
       case _ =>
         complete(StatusCodes.NotFound, "Could not retrieve user information for token")
     }
