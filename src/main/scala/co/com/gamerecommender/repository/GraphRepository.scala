@@ -16,6 +16,8 @@ trait GraphRepository {
 
   def gameWithRating(gameId: Int)
 
+  def getGamesIn(gamesIds: Seq[Long]): Seq[Game]
+
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
     val result: T = session.readTransaction(new TransactionWork[T]() {
@@ -73,8 +75,7 @@ object GraphRepository extends GraphRepository {
       params)
     val result = executeQuery(statement)
     val resultList: Seq[Record] = result.list().asScala
-    val games = resultList.map(record =>
-      Game(record))
+    val games = resultList.map(Game(_))
     games
   }
 

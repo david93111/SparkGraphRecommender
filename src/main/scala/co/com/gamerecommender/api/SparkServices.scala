@@ -21,8 +21,8 @@ trait SparkServices extends Services {
     val a: Unit = rowRDD.map(t => "Name: " + t(0)).collect.foreach(println)
   }
 
-  def getRecomendedProducts(): Future[Seq[Game]] = Future {
-    val recommendedGames = model.recommendProducts(5, 10)
+  def getRecomendedProductsForUser(userId: Int): Future[Seq[Game]] = Future {
+    val recommendedGames = model.recommendProducts(userId, 10)
     val products = recommendedGames.map(a => a.product.toLong)
     GraphRepository.getGamesIn(products.toSeq)
   }
