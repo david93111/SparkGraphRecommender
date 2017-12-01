@@ -24,7 +24,15 @@ trait Api extends SecurityDirectives with Handlers with SparkServices with Graph
             }
           }
         } ~ path("authenticate") {
-          login
+          post {
+            login
+          } ~ get {
+            authenticated { auth =>
+              obtainUserName(auth) { user =>
+                complete(OK, s"Token is active and belongs to user $user")
+              }
+            }
+          }
         } ~ path("games") {
           get {
             authenticated { auth =>

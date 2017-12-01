@@ -20,7 +20,7 @@ trait SecurityDirectives extends SecurityCodecs {
   private val secretKey = "you_shall_not_guess_this_but_if_you_guess_it_be_kind"
   private val header = JwtHeader("HS256")
 
-  protected def login: Route = post {
+  protected def login: Route = {
     entity(as[UserAuth]) {
       case UserAuth(username, pass) =>
         val user: Option[User] = GraphRepository.getUserByUserName(username)
@@ -53,7 +53,7 @@ trait SecurityDirectives extends SecurityCodecs {
   protected def authenticated: Directive1[Map[String, Any]] =
     optionalHeaderValueByName("Authorization").flatMap {
       case Some(jwt) if isTokenExpired(jwt) =>
-        complete(StatusCodes.Unauthorized -> "Token expired.")
+        complete(StatusCodes.Unauthorized -> "Token expired or invalid")
       case Some(jwt) if JsonWebToken.validate(jwt, secretKey) =>
         provide(getClaims(jwt).getOrElse(Map.empty[String, Any]))
       case _ =>
