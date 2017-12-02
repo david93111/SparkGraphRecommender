@@ -28,7 +28,7 @@ trait SecurityDirectives extends SecurityCodecs {
           complete(StatusCodes.Unauthorized, "Authentication failed, User not found")) { usr =>
             if (validateUser(usr, username, pass)) {
               val claims = setClaims(username, usr.id, tokenExpiryPeriodInDays)
-              respondWithHeader(RawHeader("x-auth-token", JsonWebToken(header, claims, secretKey))) {
+              respondWithHeader(RawHeader("X-Auth-Token", JsonWebToken(header, claims, secretKey))) {
                 complete(StatusCodes.OK, "Token generated")
               }
             } else {
