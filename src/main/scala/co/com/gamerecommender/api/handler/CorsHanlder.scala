@@ -19,7 +19,8 @@ trait CorsHanlder {
     respondWithHeaders(
       `Access-Control-Allow-Origin`(allowedOrigin),
       `Access-Control-Allow-Credentials`(true),
-      `Access-Control-Allow-Headers`("Authorization", "Content-Type", "X-Requested-With"))
+      `Access-Control-Allow-Headers`("Authorization", "Content-Type", "X-Requested-With", "x-auth-token"),
+      `Access-Control-Expose-Headers`("Authorization", "x-auth-token"))
   }
 
   //this handles preflight OPTIONS requests.
