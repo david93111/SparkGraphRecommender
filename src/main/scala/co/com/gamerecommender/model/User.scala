@@ -8,7 +8,7 @@ case class User(
   name: String,
   country: String,
   age: Int,
-  genre: String,
+  gender: String,
   id: Long) extends ApiModel
 
 object User {
