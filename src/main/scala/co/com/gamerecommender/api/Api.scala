@@ -33,12 +33,38 @@ trait Api extends SecurityDirectives with Handlers with SparkServices with Graph
               }
             }
           }
+        } ~ pathPrefix("recommend") {
+          path("games") {
+            pathEndOrSingleSlash {
+              get {
+                authenticated { auth =>
+                  obtainUserId(auth) { user =>
+                    onSuccess(getRecomendedProductsForUser(user)) { games =>
+                      complete(OK, games)
+                    }
+                  }
+                }
+              }
+            }
+          }
         } ~ path("games") {
-          get {
-            authenticated { auth =>
-              obtainUserId(auth) { user =>
-                onSuccess(getRecomendedProductsForUser(user)) { games =>
+          parameters('limit.as[Int] ? 25, 'skip.as[Int] ? 0) { (limit, skip) =>
+            get {
+              authenticated { auth =>
+                onSuccess(getAllGames(skip, limit)) { games =>
                   complete(OK, games)
+                }
+              }
+            }
+          }
+        } ~ pathPrefix("users") {
+          path("current") {
+            get {
+              authenticated { auth =>
+                obtainUserName(auth) { username =>
+                  onSuccess(getUserInfoByUsername(username)) { user =>
+                    complete(OK, user)
+                  }
                 }
               }
             }

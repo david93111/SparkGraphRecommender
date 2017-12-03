@@ -2,7 +2,14 @@ package co.com.gamerecommender.model
 
 import org.neo4j.driver.v1.{ Record, Value }
 
-case class User(username: String, pass: String, name: String, country: String, age: Int, genre: String, id: Long)
+case class User(
+  username: String,
+  pass: String,
+  name: String,
+  country: String,
+  age: Int,
+  genre: String,
+  id: Long) extends ApiModel
 
 object User {
   def apply(record: Record): User = {

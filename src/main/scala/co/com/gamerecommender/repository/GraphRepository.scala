@@ -14,6 +14,8 @@ trait GraphRepository {
 
   def getUserByUserName(username: String): Option[User]
 
+  def getAllGamesWithLimit(skip: Int, limit: Int): Seq[Game]
+
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
     val result: T = session.readTransaction(new TransactionWork[T]() {
@@ -81,5 +83,14 @@ object GraphRepository extends GraphRepository {
     val result = executeQuery(statement)
     val record = result.list().asScala.headOption
     record.map(User(_))
+  }
+
+  override def getAllGamesWithLimit(skip: Int, limit: Int): Seq[Game] = {
+    val params = Map[String, Object]("limit" -> Int.box(limit), "skip" -> Int.box(skip)).asJava
+    val dataReturn: String = "RETURN g.name as name, g.rate as rate,g.company as company, g.year as year"
+    val statement = new Statement(s"MATCH(g:GAME) $dataReturn SKIP {skip} LIMIT {limit}", params)
+    val result = executeQuery(statement)
+    val resultList: Seq[Record] = result.list().asScala
+    resultList.map(Game(_))
   }
 }

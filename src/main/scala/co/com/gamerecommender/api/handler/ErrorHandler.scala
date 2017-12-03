@@ -8,7 +8,7 @@ trait ErrorHandler {
 
   val exceptionHanlder = ExceptionHandler {
     case e: Exception =>
-      complete(StatusCodes.InternalServerError -> "Unexpected error trying to fulfill the operation")
+      complete(StatusCodes.InternalServerError -> s"Unexpected error trying to fulfill the operation, Cause: ${e}")
   }
 
   def errorHandler: Directive0 = handleExceptions(exceptionHanlder)

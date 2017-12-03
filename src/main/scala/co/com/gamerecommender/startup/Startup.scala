@@ -28,7 +28,7 @@ object Startup {
 
   def startUp()(implicit system: ActorSystem) = {
 
-    val conf = new SparkConf().setAppName("CollaborativeFilteringExample").setMaster("local[2]").set("spark.executor.memory", "1g")
+    val conf = new SparkConf().setAppName("GameRecommender").setMaster("local[2]").set("spark.executor.memory", "1g")
     val sc: SparkContext = new SparkContext(conf)
 
     val api = new Api {

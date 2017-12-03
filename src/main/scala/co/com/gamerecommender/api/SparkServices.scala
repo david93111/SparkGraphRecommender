@@ -1,5 +1,6 @@
 package co.com.gamerecommender.api
 
+import co.com.gamerecommender.conf.BaseConfig
 import co.com.gamerecommender.model.Game
 import co.com.gamerecommender.repository.GraphRepository
 import org.apache.spark.SparkContext
@@ -22,7 +23,7 @@ trait SparkServices extends Services {
   }
 
   def getRecomendedProductsForUser(userId: Int): Future[Seq[Game]] = Future {
-    val recommendedGames = model.recommendProducts(userId, 10)
+    val recommendedGames = model.recommendProducts(userId, BaseConfig.recomLimit)
     val products = recommendedGames.map(a => a.product.toLong)
     GraphRepository.getGamesIn(products.toSeq)
   }
