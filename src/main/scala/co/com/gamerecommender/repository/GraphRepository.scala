@@ -5,6 +5,7 @@ import co.com.gamerecommender.model.{ Game, User }
 import org.neo4j.driver.v1._
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 trait GraphRepository {
 
@@ -15,6 +16,8 @@ trait GraphRepository {
   def getUserByUserName(username: String): Option[User]
 
   def getAllGamesWithLimit(skip: Int, limit: Int): Seq[Game]
+
+  def recommendedGamesOfRelatedUsers(username: String): Seq[Game]
 
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
@@ -92,5 +95,26 @@ object GraphRepository extends GraphRepository {
     val result = executeQuery(statement)
     val resultList: Seq[Record] = result.list().asScala
     resultList.map(Game(_))
+  }
+
+  override def recommendedGamesOfRelatedUsers(username: String): Seq[Game] = {
+    val params = Map[String, Object](
+      "username" -> username,
+      "limit" -> Int.box(BaseConfig.recomLimit)).asJava
+    val query: String = """MATCH(u:USER{username: {username} })
+                             |MATCH(related:USER)-[rel:LIKES|RATES]->(g:GAME)
+                             |WHERE (
+                             |(related.age >= u.age - 4 AND related.age <= u.age +4 and related.country = u.country)
+                             |OR (related.age >= u.age - 4 AND related.age <= u.age +4 and related.genre = u.genre)
+                             |OR (related.genre = u.genre AND related.country = u.country)
+                             |) AND g.rate > 3.8 AND u.username <> related.username
+                             |RETURN distinct g as game ORDER BY g.rate LIMIT {limit} """.stripMargin
+    val statement = new Statement(query, params)
+    val applyFuncToGames: StatementResult => Seq[Game] = (r: StatementResult) => {
+      val resultList = r.list().asScala
+      resultList.map(record => Game(record.get(0)))
+    }
+    val result: Seq[Game] = executeReadTx(statement, applyFuncToGames)
+    result
   }
 }

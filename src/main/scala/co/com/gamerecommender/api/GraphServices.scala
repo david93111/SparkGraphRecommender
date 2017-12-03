@@ -23,4 +23,9 @@ trait GraphServices extends Services {
     result
   }
 
+  def recommendedGamesByProfile(username: String): Future[Seq[Game]] = Future {
+    val result = GraphRepository.recommendedGamesOfRelatedUsers(username)
+    result
+  }
+
 }

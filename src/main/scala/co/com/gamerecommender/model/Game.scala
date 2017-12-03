@@ -1,11 +1,19 @@
 package co.com.gamerecommender.model
 
-import org.neo4j.driver.v1.Record
+import org.neo4j.driver.v1.{ Record, Value }
 
 case class Game(name: String, company: String, year: String, rate: Double)
 
 object Game {
   def apply(record: Record): Game = {
+    Game(
+      record.get("name").asString(),
+      record.get("company").asString(),
+      record.get("year").asString(),
+      record.get("rate").asDouble())
+  }
+
+  def apply(record: Value): Game = {
     Game(
       record.get("name").asString(),
       record.get("company").asString(),

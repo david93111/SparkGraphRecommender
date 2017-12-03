@@ -34,14 +34,18 @@ trait Api extends SecurityDirectives with Handlers with SparkServices with Graph
             }
           }
         } ~ pathPrefix("recommend") {
-          path("games") {
-            pathEndOrSingleSlash {
-              get {
-                authenticated { auth =>
-                  obtainUserId(auth) { user =>
-                    onSuccess(getRecomendedProductsForUser(user)) { games =>
-                      complete(OK, games)
-                    }
+          get {
+            authenticated { auth =>
+              path("games") {
+                obtainUserId(auth) { user =>
+                  onSuccess(getRecomendedProductsForUser(user)) { games =>
+                    complete(OK, games)
+                  }
+                }
+              } ~ path("byprofile") {
+                obtainUserName(auth) { user =>
+                  onSuccess(recommendedGamesByProfile(user)) { games =>
+                    complete(OK, games)
                   }
                 }
               }
