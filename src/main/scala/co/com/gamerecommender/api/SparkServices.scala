@@ -25,7 +25,8 @@ trait SparkServices extends Services {
   def getRecomendedProductsForUser(userId: Int): Future[Seq[Game]] = Future {
     val recommendedGames = model.recommendProducts(userId, BaseConfig.recomLimit)
     val products = recommendedGames.map(a => a.product.toLong)
-    GraphRepository.getGamesIn(products.toSeq)
+    val games = GraphRepository.getGamesIn(products.toSeq)
+    games.sortBy(-_.rate)
   }
 
   def trainModel(): MatrixFactorizationModel = {
