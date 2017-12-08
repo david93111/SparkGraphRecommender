@@ -10,7 +10,7 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 
 import scala.concurrent.Future
 
-trait Api extends SecurityDirectives with Handlers with SparkServices with GraphServices {
+trait Api extends SecurityDirectives with Handlers with RecommenderServices with GraphServices {
 
   val apiRoute: Route = errorHandler {
     pathPrefix("recommender") {
@@ -33,12 +33,19 @@ trait Api extends SecurityDirectives with Handlers with SparkServices with Graph
               }
             }
           }
+        } ~ path("train") {
+          get {
+            authenticated { auth =>
+              trainRecommender()
+              complete(OK, "Training Started")
+            }
+          }
         } ~ pathPrefix("recommend") {
           get {
             authenticated { auth =>
               path("games") {
                 obtainUserId(auth) { user =>
-                  onSuccess(getRecomendedProductsForUser(user)) { games =>
+                  onSuccess(getRecommendationsForUser(user)) { games =>
                     complete(OK, games)
                   }
                 }
@@ -77,7 +84,6 @@ trait Api extends SecurityDirectives with Handlers with SparkServices with Graph
           pathEndOrSingleSlash {
             get {
               authenticated { _ =>
-                testProcessNeo4j()
                 testNeoDriver()
                 complete(OK, "OK")
               }

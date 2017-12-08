@@ -5,7 +5,6 @@ import co.com.gamerecommender.model.{ Game, User }
 import org.neo4j.driver.v1._
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 trait GraphRepository {
 

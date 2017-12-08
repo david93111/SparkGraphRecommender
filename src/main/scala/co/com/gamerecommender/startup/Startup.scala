@@ -1,17 +1,16 @@
 package co.com.gamerecommender.startup
 
-import akka.actor.ActorSystem
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import co.com.gamerecommender.actor.RecommenderActor
 import co.com.gamerecommender.api.Api
 import co.com.gamerecommender.conf.BaseConfig
 import com.typesafe.config.Config
-import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
 import org.apache.spark.{ SparkConf, SparkContext }
-import org.neo4j.spark.Neo4j
 
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor, Future }
@@ -28,7 +27,9 @@ object Startup {
 
   def startUp()(implicit system: ActorSystem) = {
 
-    val conf = new SparkConf().setAppName("GameRecommender").setMaster("local[2]").set("spark.executor.memory", "1g")
+    val masterConf = BaseConfig.sparkMaster
+
+    val conf = new SparkConf().setAppName("GameRecommender").setMaster(masterConf).set("spark.executor.memory", "1g")
     val sc: SparkContext = new SparkContext(conf)
 
     val api = new Api {
@@ -36,9 +37,8 @@ object Startup {
       implicit val executionContext: ExecutionContext = Context.defaultDispatcher
 
       val sparkContext: SparkContext = sc
-      val neoSpark: Neo4j = Neo4j(sparkContext)
 
-      val model: MatrixFactorizationModel = trainModel()
+      val recommenderActor: ActorRef = system.actorOf(RecommenderActor.props(sparkContext), "recommender")
     }
 
     implicit val ec: ExecutionContextExecutor = system.dispatcher
