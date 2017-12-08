@@ -1,0 +1,9 @@
+Version 0.2.0
+---------------------
++ Added capabilities of re-train the model on execution
++ Added auto training capabilities through actors
++ Added workers as actor router to generate recommendations
+
+Version 0.1.0
+---------------------
++ Initial version for recommendations system with spark and neo4j
