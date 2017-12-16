@@ -56,7 +56,7 @@ class RecommenderActor(sparkContext: SparkContext) extends BaseActor {
   private def trainModel(): MatrixFactorizationModel = {
     val rank = 10
     val numIterations = 10
-    val ratings = obtainAllRatings()
+    val ratings: RDD[Rating] = obtainAllRatings()
     val trainedModel: MatrixFactorizationModel = ALS.train(ratings, rank, numIterations, 0.01)
     trainedModel
   }
@@ -64,6 +64,7 @@ class RecommenderActor(sparkContext: SparkContext) extends BaseActor {
   private def obtainAllRatings(): RDD[Rating] = {
     val rowRDD: RDD[Row] = neoSpark.cypher(
       "MATCH (u:USER)-[r:RATES]->(g:GAME) return id(u) as user,id(g) as game,r.rate as rating").loadRowRdd
+    println("row rdd" + rowRDD)
     val ratings: RDD[Rating] = rowRDD.map(row => Rating(row.getLong(0).toInt, row.getLong(1).toInt, row.getDouble(2)))
     ratings
   }

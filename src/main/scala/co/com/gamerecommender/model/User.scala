@@ -20,7 +20,7 @@ object User {
       node.get("name").asString(),
       node.get("country").asString(),
       node.get("age").asInt(),
-      node.get("genre").asString(),
+      node.get("gender").asString(),
       record.get("id").asLong())
   }
 }

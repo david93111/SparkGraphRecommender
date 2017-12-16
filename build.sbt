@@ -53,7 +53,7 @@ mainClass in Compile := Some("co.com.gamerecommender.startup.Startup")
 enablePlugins(JavaServerAppPackaging)
 
 javaOptions in reStart := Seq(
-  "-Dspark.neo4j.bolt.password=admin"
+  "-Dspark.neo4j.bolt.password=davidvadmin"
 )
 
 packageName in Universal := name.value

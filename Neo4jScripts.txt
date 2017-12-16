@@ -1,6 +1,8 @@
-MATCH(a:GAME{name:"Paladins"})
-MATCH(u:USER{username:"davidv"})
-CREATE (u)-[like:LIKES]->(a)
-CREATE (u)-[rate:RATES{dateMilis:1511730136583,rate:5.0}]->(a)
-return a,u,like,rate
 
+CREATE(u:USER{name:"David Vasquez",username:"davidv",pass:"davidv",country:"COL",gender:"M",age:24})
+CREATE(g:GAME{name:"Paladins",company:"Hi-Rez",year:2016,rate:4.7})
+
+MATCH (u:USER{username:"davidv"})
+MATCH (g:GAME{name:"Paladins"})
+CREATE (u)-[r:RATES{dateMilis:1513445563159,rate:4.6}]->(g)
+RETURN u,r,g

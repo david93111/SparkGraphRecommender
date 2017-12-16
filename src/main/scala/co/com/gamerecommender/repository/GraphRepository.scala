@@ -104,8 +104,8 @@ object GraphRepository extends GraphRepository {
                              |MATCH(related:USER)-[rel:LIKES|RATES]->(g:GAME)
                              |WHERE (
                              |(related.age >= u.age - 4 AND related.age <= u.age +4 and related.country = u.country)
-                             |OR (related.age >= u.age - 4 AND related.age <= u.age +4 and related.genre = u.genre)
-                             |OR (related.genre = u.genre AND related.country = u.country)
+                             |OR (related.age >= u.age - 4 AND related.age <= u.age +4 and related.gender = u.gender)
+                             |OR (related.gender = u.gender AND related.country = u.country)
                              |) AND g.rate > 3.8 AND u.username <> related.username
                              |RETURN distinct g as game ORDER BY g.rate LIMIT {limit} """.stripMargin
     val statement = new Statement(query, params)
