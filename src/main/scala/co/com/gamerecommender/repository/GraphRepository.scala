@@ -71,7 +71,7 @@ object GraphRepository extends GraphRepository {
   def getGamesIn(gamesIds: Seq[Long]): Seq[Game] = {
     val params = Map[String, Object]("gamesIds" -> gamesIds.asJava).asJava
     val statement = new Statement(
-      "MATCH (g:GAME) WHERE id(g) IN {gamesIds} RETURN g.name as name, g.rate as rate,g.company as company, g.year as year",
+      "MATCH (g:GAME) WHERE id(g) IN {gamesIds} RETURN g as game, id(g) as id",
       params)
     val result = executeQuery(statement)
     val resultList: Seq[Record] = result.list().asScala
@@ -89,7 +89,7 @@ object GraphRepository extends GraphRepository {
 
   override def getAllGamesWithLimit(skip: Int, limit: Int): Seq[Game] = {
     val params = Map[String, Object]("limit" -> Int.box(limit), "skip" -> Int.box(skip)).asJava
-    val dataReturn: String = "RETURN g.name as name, g.rate as rate,g.company as company, g.year as year"
+    val dataReturn: String = "RETURN g as game, id(g) as id"
     val statement = new Statement(s"MATCH(g:GAME) $dataReturn SKIP {skip} LIMIT {limit}", params)
     val result = executeQuery(statement)
     val resultList: Seq[Record] = result.list().asScala
@@ -107,11 +107,11 @@ object GraphRepository extends GraphRepository {
                              |OR (related.age >= u.age - 4 AND related.age <= u.age +4 and related.gender = u.gender)
                              |OR (related.gender = u.gender AND related.country = u.country)
                              |) AND g.rate > 3.8 AND u.username <> related.username
-                             |RETURN distinct g as game ORDER BY g.rate LIMIT {limit} """.stripMargin
+                             |RETURN distinct g as game, id(g) ORDER BY g.rate LIMIT {limit} """.stripMargin
     val statement = new Statement(query, params)
     val applyFuncToGames: StatementResult => Seq[Game] = (r: StatementResult) => {
       val resultList = r.list().asScala
-      resultList.map(record => Game(record.get(0)))
+      resultList.map(Game(_))
     }
     val result: Seq[Game] = executeReadTx(statement, applyFuncToGames)
     result

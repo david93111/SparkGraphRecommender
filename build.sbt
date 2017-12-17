@@ -2,7 +2,7 @@ import scalariform.formatter.preferences._
 
 name := "recommender-core"
 
-version := "0.2.0"
+version := "0.2.1"
 
 scalaVersion := "2.11.8"
 
@@ -45,7 +45,7 @@ lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "hello"
+    buildInfoPackage := "co.com.gamerecommender.api"
   )
 
 mainClass in Compile := Some("co.com.gamerecommender.startup.Startup")

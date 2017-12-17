@@ -95,8 +95,6 @@ trait Api extends SecurityDirectives with Handlers with RecommenderServices with
   }
 
   private def getPing = Future {
-    val p = getClass.getPackage
-    val version = p.getImplementationVersion
-    s"Status OK - version: $version"
+    s"Status OK - version: ${BuildInfo.version}"
   }
 }
