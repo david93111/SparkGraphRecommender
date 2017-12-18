@@ -21,20 +21,19 @@ trait SecurityDirectives extends SecurityCodecs {
   private val header = JwtHeader("HS256")
 
   protected def login: Route = {
-    entity(as[UserAuth]) {
-      case UserAuth(username, pass) =>
-        val user: Option[User] = GraphRepository.getUserByUserName(username)
-        user.fold[Route](
-          complete(StatusCodes.Unauthorized, "Authentication failed, User not found")) { usr =>
-            if (validateUser(usr, username, pass)) {
-              val claims = setClaims(username, usr.id, tokenExpiryPeriodInDays)
-              respondWithHeader(RawHeader("X-Auth-Token", JsonWebToken(header, claims, secretKey))) {
-                complete(StatusCodes.OK, "Token generated")
-              }
-            } else {
-              complete(StatusCodes.Unauthorized, "Authentication failed, Invalid Credentials")
+    entity(as[UserAuth]) { userAuth =>
+      val user: Option[User] = GraphRepository.getUserByUserName(userAuth.username)
+      user.fold[Route](
+        complete(StatusCodes.Unauthorized, "Authentication failed, User not found")) { usr =>
+          if (validateUser(usr, userAuth.username, userAuth.password)) {
+            val claims = setClaims(userAuth.username, usr.id, tokenExpiryPeriodInDays)
+            respondWithHeader(RawHeader("X-Auth-Token", JsonWebToken(header, claims, secretKey))) {
+              complete(StatusCodes.OK, "Token generated")
             }
+          } else {
+            complete(StatusCodes.Unauthorized, "Authentication failed, Invalid Credentials")
           }
+        }
     }
   }
 

@@ -1,6 +1,6 @@
 package co.com.gamerecommender.api
 
-import co.com.gamerecommender.model.{ ApiError, ApiModel, Game, User }
+import co.com.gamerecommender.model._
 import co.com.gamerecommender.repository.GraphRepository
 
 import scala.concurrent.Future
@@ -25,6 +25,11 @@ trait GraphServices extends Services {
 
   def recommendedGamesByProfile(username: String): Future[Seq[Game]] = Future {
     val result = GraphRepository.recommendedGamesOfRelatedUsers(username)
+    result
+  }
+
+  def giveLikeToGame(username: String, gameId: Long): Future[RelationResult] = Future {
+    val result = GraphRepository.likeGame(username, gameId)
     result
   }
 
