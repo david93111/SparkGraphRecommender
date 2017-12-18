@@ -1,3 +1,13 @@
+Version 0.3.0
+---------------------
++ New services for like and rate games
++ New codecs for new entities for like and rate request, and relation result response
++ Minor adjustments on API
+
+Version 0.2.1
+---------------------
++ Minor changes on model and repository interaction
+
 Version 0.2.0
 ---------------------
 + Added capabilities of re-train the model on execution

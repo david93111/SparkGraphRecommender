@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import co.com.gamerecommender.api.directives.SecurityDirectives
 import co.com.gamerecommender.api.handler.Handlers
-import co.com.gamerecommender.model.GameRelationRequest
+import co.com.gamerecommender.model.{ GameLikeRequest, GameRateRequest }
 // Dont delete if is seen as unused, is required for circe codec over akka http
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 
@@ -65,8 +65,16 @@ trait Api extends SecurityDirectives with Handlers with RecommenderServices with
               obtainUserName(auth) { user =>
                 path("like") {
                   post {
-                    entity(as[GameRelationRequest]) { gameRequest =>
-                      onSuccess(giveLikeToGame(user, gameRequest.gameId)) { res =>
+                    entity(as[GameLikeRequest]) { gameRequest =>
+                      onSuccess(giveLikeToGame(user, gameRequest)) { res =>
+                        complete(OK, res)
+                      }
+                    }
+                  }
+                } ~ path("rate") {
+                  post {
+                    entity(as[GameRateRequest]) { gameRequest =>
+                      onSuccess(giveRateToGame(user, gameRequest)) { res =>
                         complete(OK, res)
                       }
                     }

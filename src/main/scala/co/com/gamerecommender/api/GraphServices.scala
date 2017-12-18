@@ -1,5 +1,8 @@
 package co.com.gamerecommender.api
 
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.server.StandardRoute
+import akka.http.scaladsl.server.Directives._
 import co.com.gamerecommender.model._
 import co.com.gamerecommender.repository.GraphRepository
 
@@ -28,8 +31,13 @@ trait GraphServices extends Services {
     result
   }
 
-  def giveLikeToGame(username: String, gameId: Long): Future[RelationResult] = Future {
-    val result = GraphRepository.likeGame(username, gameId)
+  def giveLikeToGame(username: String, relationRequest: GameLikeRequest): Future[RelationResult] = Future {
+    val result = GraphRepository.likeGame(username, relationRequest.gameId)
+    result
+  }
+
+  def giveRateToGame(username: String, relationRequest: GameRateRequest): Future[RelationResult] = Future {
+    val result = GraphRepository.rateGame(username, relationRequest.gameId, relationRequest.rate)
     result
   }
 

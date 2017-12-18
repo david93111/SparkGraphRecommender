@@ -24,6 +24,8 @@ sealed trait GraphRepository {
 
   def likeGame(username: String, gameId: Long): RelationResult
 
+  def rateGame(username: String, gameId: Long, rate: Double): RelationResult
+
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
     val result: T = session.readTransaction(new TransactionWork[T]() {
@@ -149,6 +151,47 @@ object GraphRepository extends GraphRepository {
 
       RelationResult(
         RelationTypes.LIKE,
+        username,
+        record.get("name").asString(),
+        gameId,
+        formatter.format(instant.atZone(defaultZone)),
+        RelationStatuses.CREATED)
+
+    }
+
+    val result: RelationResult = executeWriteTx(statement, applyFuncToLike)
+    result
+
+  }
+
+  override def rateGame(username: String, gameId: Long, rate: Double): RelationResult = {
+    val params = Map[String, Object](
+      "username" -> username,
+      "gameId" -> Long.box(gameId),
+      "rate" -> Double.box(rate),
+      "dateMilis" -> Long.box(System.currentTimeMillis()))
+
+    val query =
+      """MATCH(u:USER{username: {username} })
+        |MATCH(g:GAME) where id(g) = {gameId}
+        |MERGE (u)-[r:RATES{dateMilis: {dateMilis} , rate: {rate} }]->(g)
+        |RETURN r.dateMilis as milis,g.name as name
+      """.stripMargin
+
+    val statement = new Statement(query, params.asJava)
+
+    val applyFuncToLike: StatementResult => RelationResult = (res: StatementResult) => {
+
+      val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
+
+      val record: Record = res.single()
+
+      val instant = Instant.ofEpochMilli(record.get("milis").asLong())
+
+      val formatter = DateTimeFormatter.ISO_DATE
+
+      RelationResult(
+        RelationTypes.RATE,
         username,
         record.get("name").asString(),
         gameId,

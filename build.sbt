@@ -2,7 +2,7 @@ import scalariform.formatter.preferences._
 
 name := "recommender-core"
 
-version := "0.2.1"
+version := "0.3.0"
 
 scalaVersion := "2.11.8"
 
