@@ -168,6 +168,78 @@
 			"response": []
 		},
 		{
+			"name": "Like Game",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGF2aWR2IiwidXNlcklEIjowLCJleHBpcmVzQXQiOjE1MTM2MTExMTk3OTZ9.rbeI69RX0pzKPOf17QGU-ETz5U8h5ONbmKtEO_6kRhc"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"gameId\":20\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8022/recommender/games/relation/like",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8022",
+					"path": [
+						"recommender",
+						"games",
+						"relation",
+						"like"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Rate Game",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGF2aWR2IiwidXNlcklEIjowLCJleHBpcmVzQXQiOjE1MTM3MTc1NTUzMjJ9.G4k7Yk-HlYkuqQhbY9uTHL45473imuzT9fbLJ-9p7Ws"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"gameId\":20,\n\t\"rate\":4.5\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8022/recommender/games/relation/rate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8022",
+					"path": [
+						"recommender",
+						"games",
+						"relation",
+						"rate"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Current User Info",
 			"request": {
 				"method": "GET",
