@@ -1,8 +1,5 @@
 package co.com.gamerecommender.api
 
-import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.StandardRoute
-import akka.http.scaladsl.server.Directives._
 import co.com.gamerecommender.model._
 import co.com.gamerecommender.repository.GraphRepository
 

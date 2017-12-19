@@ -124,7 +124,7 @@ object GraphRepository extends GraphRepository {
                              |OR (related.age >= u.age - 4 AND related.age <= u.age +4 and related.gender = u.gender)
                              |OR (related.gender = u.gender AND related.country = u.country)
                              |) AND g.rate > 3.8 AND u.username <> related.username
-                             |RETURN distinct g as game, id(g) ORDER BY g.rate LIMIT {limit} """.stripMargin
+                             |RETURN distinct g as game, id(g) as id ORDER BY g.rate LIMIT {limit} """.stripMargin
     val statement = new Statement(query, params.asJava)
     val applyFuncToGames: StatementResult => Seq[Game] = (r: StatementResult) => {
       val resultList = r.list().asScala

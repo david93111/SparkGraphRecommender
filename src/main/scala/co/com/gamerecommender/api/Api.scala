@@ -60,19 +60,23 @@ trait Api extends SecurityDirectives with Handlers with RecommenderServices with
             }
           }
         } ~ pathPrefix("games") {
-          authenticated { auth =>
-            pathPrefix("relation") {
-              obtainUserName(auth) { user =>
-                path("like") {
-                  post {
+          pathPrefix("relation") {
+            path("like") {
+              post {
+                authenticated { auth =>
+                  obtainUserName(auth) { user =>
                     entity(as[GameLikeRequest]) { gameRequest =>
                       onSuccess(giveLikeToGame(user, gameRequest)) { res =>
                         complete(OK, res)
                       }
                     }
                   }
-                } ~ path("rate") {
-                  post {
+                }
+              }
+            } ~ path("rate") {
+              post {
+                authenticated { auth =>
+                  obtainUserName(auth) { user =>
                     entity(as[GameRateRequest]) { gameRequest =>
                       onSuccess(giveRateToGame(user, gameRequest)) { res =>
                         complete(OK, res)
@@ -81,8 +85,10 @@ trait Api extends SecurityDirectives with Handlers with RecommenderServices with
                   }
                 }
               }
-            } ~ pathEndOrSingleSlash {
-              get {
+            }
+          } ~ pathEndOrSingleSlash {
+            get {
+              authenticated { auth =>
                 parameters('limit.as[Int] ? 25, 'skip.as[Int] ? 0) { (limit, skip) =>
                   onSuccess(getAllGames(skip, limit)) { games =>
                     complete(OK, games)

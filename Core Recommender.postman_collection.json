@@ -81,7 +81,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGF2aWR2IiwidXNlcklEIjowLCJleHBpcmVzQXQiOjE1MTM2MTExMTk3OTZ9.rbeI69RX0pzKPOf17QGU-ETz5U8h5ONbmKtEO_6kRhc"
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGF2aWR2IiwidXNlcklEIjowLCJleHBpcmVzQXQiOjE1MTM4MDM1NTM3NTB9.3R086uZ7giNh-2WCL0smDem9S6jZTY3ZoNnizvbIExw"
 					}
 				],
 				"body": {
@@ -89,7 +89,7 @@
 					"raw": "{\n\t\"username\":\"davidv\",\n\t\"password\":\"davidv\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8022/recommender/authenticate",
+					"raw": "http://localhost:8022/recommender/train",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -97,7 +97,7 @@
 					"port": "8022",
 					"path": [
 						"recommender",
-						"authenticate"
+						"train"
 					]
 				},
 				"description": ""
