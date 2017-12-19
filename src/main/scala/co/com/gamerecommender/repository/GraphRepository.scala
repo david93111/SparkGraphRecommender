@@ -1,7 +1,7 @@
 package co.com.gamerecommender.repository
 
 import java.time.format.DateTimeFormatter
-import java.time.{ Clock, Instant, LocalDateTime, ZoneId }
+import java.time.{ Clock, Instant, ZoneId }
 
 import co.com.gamerecommender.conf.BaseConfig
 import co.com.gamerecommender.model.relation.RelationTypes
@@ -31,24 +31,23 @@ sealed trait GraphRepository {
 
   protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
-    val result: T = session.readTransaction(new TransactionWork[T]() {
-      override def execute(transaction: Transaction): T = {
-        val stResult: StatementResult = transaction.run(query)
-        applyFun(stResult)
-      }
-    })
+    val result: T = session.readTransaction(createTransactionWork[T](query, applyFun))
     result
   }
 
   protected def executeWriteTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
     val session = neoDriver.session()
-    val result: T = session.writeTransaction(new TransactionWork[T]() {
+    val result: T = session.writeTransaction(createTransactionWork[T](query, applyFun))
+    result
+  }
+
+  private def createTransactionWork[T](query: Statement, applyFun: (StatementResult) => T): TransactionWork[T] = {
+    new TransactionWork[T]() {
       override def execute(transaction: Transaction): T = {
         val stResult: StatementResult = transaction.run(query)
         applyFun(stResult)
       }
-    })
-    result
+    }
   }
 
   protected def executeQuery(query: Statement): StatementResult = {
