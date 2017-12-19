@@ -12,8 +12,8 @@ import scala.collection.JavaConverters._
 
 sealed trait GraphRepository {
 
-  val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
-  val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+  protected val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
+  protected val formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
   val neoDriver: Driver
 
@@ -56,9 +56,9 @@ sealed trait GraphRepository {
     result
   }
 
-  protected def getDateFormattedFromMilis(timeMilis: Long): String = {
+  protected def getDateFormattedFromMillis(timeMillis: Long): String = {
 
-    val instant = Instant.ofEpochMilli(timeMilis)
+    val instant = Instant.ofEpochMilli(timeMillis)
 
     formatter.format(instant.atZone(defaultZone))
   }
@@ -155,7 +155,7 @@ object GraphRepository extends GraphRepository {
 
       val record: Record = res.single()
 
-      val dateString = getDateFormattedFromMilis(record.get("milis").asLong())
+      val dateString = getDateFormattedFromMillis(record.get("milis").asLong())
 
       RelationResult(
         RelationTypes.LIKE,
@@ -196,7 +196,7 @@ object GraphRepository extends GraphRepository {
 
       val record: Record = res.single()
 
-      val dateString = getDateFormattedFromMilis(record.get("milis").asLong())
+      val dateString = getDateFormattedFromMillis(record.get("milis").asLong())
 
       RelationResult(
         RelationTypes.RATE,
