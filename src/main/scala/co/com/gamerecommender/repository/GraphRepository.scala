@@ -1,16 +1,19 @@
 package co.com.gamerecommender.repository
 
 import java.time.format.DateTimeFormatter
-import java.time.{ Clock, Instant, ZoneId }
+import java.time.{ Clock, Instant, LocalDateTime, ZoneId }
 
 import co.com.gamerecommender.conf.BaseConfig
-import co.com.gamerecommender.model.relation.{ RelationStatuses, RelationTypes }
+import co.com.gamerecommender.model.relation.RelationTypes
 import co.com.gamerecommender.model.{ Game, RelationResult, User }
 import org.neo4j.driver.v1._
 
 import scala.collection.JavaConverters._
 
 sealed trait GraphRepository {
+
+  val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
+  val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
   val neoDriver: Driver
 
@@ -52,6 +55,13 @@ sealed trait GraphRepository {
     val session = neoDriver.session()
     val result = session.run(query)
     result
+  }
+
+  protected def getDateFormattedFromMilis(timeMilis: Long): String = {
+
+    val instant = Instant.ofEpochMilli(timeMilis)
+
+    formatter.format(instant.atZone(defaultZone))
   }
 
 }
@@ -144,20 +154,16 @@ object GraphRepository extends GraphRepository {
 
     val applyFuncToLike: StatementResult => RelationResult = (res: StatementResult) => {
 
-      val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
-
       val record: Record = res.single()
 
-      val instant = Instant.ofEpochMilli(record.get("milis").asLong())
-
-      val formatter = DateTimeFormatter.ISO_DATE
+      val dateString = getDateFormattedFromMilis(record.get("milis").asLong())
 
       RelationResult(
         RelationTypes.LIKE,
         username,
         record.get("name").asString(),
         gameId,
-        formatter.format(instant.atZone(defaultZone)),
+        dateString,
         record.get("status").asString())
 
     }
@@ -189,20 +195,16 @@ object GraphRepository extends GraphRepository {
 
     val applyFuncToLike: StatementResult => RelationResult = (res: StatementResult) => {
 
-      val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
-
       val record: Record = res.single()
 
-      val instant = Instant.ofEpochMilli(record.get("milis").asLong())
-
-      val formatter = DateTimeFormatter.ISO_DATE
+      val dateString = getDateFormattedFromMilis(record.get("milis").asLong())
 
       RelationResult(
         RelationTypes.RATE,
         username,
         record.get("name").asString(),
         gameId,
-        formatter.format(instant.atZone(defaultZone)),
+        dateString,
         record.get("status").asString())
 
     }
