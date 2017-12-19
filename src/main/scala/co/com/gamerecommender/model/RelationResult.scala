@@ -6,7 +6,7 @@ case class RelationResult(relationType: String, username: String, gameName: Stri
 
 object RelationResult {
 
-  def apply(relationType: RelationType, username: String, gameName: String, gameId: Long, operationDate: String, status: RelationStatus): RelationResult = {
-    RelationResult(relationType.toString, username, gameName, gameId, operationDate, status.toString)
+  def apply(relationType: RelationType, username: String, gameName: String, gameId: Long, operationDate: String, status: String): RelationResult = {
+    RelationResult(relationType.toString, username, gameName, gameId, operationDate, status)
   }
 }

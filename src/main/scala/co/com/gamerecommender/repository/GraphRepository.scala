@@ -133,8 +133,11 @@ object GraphRepository extends GraphRepository {
     val query =
       """MATCH(u:USER{username: {username} })
         |MATCH(g:GAME) where id(g) = {gameId}
-        |MERGE (u)-[r:LIKES{dateMilis: {dateMilis} }]->(g)
-        |RETURN r.dateMilis as milis,g.name as name
+        |MERGE (u)-[r:LIKES]->(g)
+        |ON CREATE SET r.status = "CREATED"
+        |ON MATCH SET r.status = "UPDATED"
+        |SET r.dateMilis = {dateMilis}
+        |RETURN r.dateMilis as milis,g.name as name, r.status as status
       """.stripMargin
 
     val statement = new Statement(query, params.asJava)
@@ -155,7 +158,7 @@ object GraphRepository extends GraphRepository {
         record.get("name").asString(),
         gameId,
         formatter.format(instant.atZone(defaultZone)),
-        RelationStatuses.CREATED)
+        record.get("status").asString())
 
     }
 
@@ -174,8 +177,12 @@ object GraphRepository extends GraphRepository {
     val query =
       """MATCH(u:USER{username: {username} })
         |MATCH(g:GAME) where id(g) = {gameId}
-        |MERGE (u)-[r:RATES{dateMilis: {dateMilis} , rate: {rate} }]->(g)
-        |RETURN r.dateMilis as milis,g.name as name
+        |MERGE (u)-[r:RATES]->(g)
+        |ON CREATE SET r.status = "CREATED"
+        |ON MATCH SET r.status = "UPDATED"
+        |SET r.dateMilis = {dateMilis}
+        |SET r.rate = {rate}
+        |RETURN r.dateMilis as milis,g.name as name, r.status as status
       """.stripMargin
 
     val statement = new Statement(query, params.asJava)
@@ -196,7 +203,7 @@ object GraphRepository extends GraphRepository {
         record.get("name").asString(),
         gameId,
         formatter.format(instant.atZone(defaultZone)),
-        RelationStatuses.CREATED)
+        record.get("status").asString())
 
     }
 
