@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 import akka.actor.{ ActorRef, Cancellable, Props }
 import akka.pattern.{ ask, pipe }
 import akka.routing.FromConfig
-import co.com.gamerecommender.actor.RecommenderActor.{ AutoTrainModel, EnableAutoTrain, RecommendGamesForUser, TrainModel }
-import co.com.gamerecommender.actor.RecommenderWorker.RecommendGamesUser
+import co.com.gamerecommender.actor.RecommenderActor._
+import co.com.gamerecommender.actor.RecommenderWorker.{ CalcGameRate, RecommendGamesUser }
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.{ ALS, MatrixFactorizationModel, Rating }
 import org.apache.spark.rdd.RDD
@@ -42,6 +42,8 @@ class RecommenderActor(sparkContext: SparkContext) extends BaseActor {
       val sendTo = sender()
       val result = recommenderWorkers ? RecommendGamesUser(user, model)
       result pipeTo sendTo
+    case RecalculateGameRate(id) =>
+      recommenderWorkers ! CalcGameRate(id)
     case AutoTrainModel =>
       if (needTraining) {
         model = Some(trainModel())
@@ -76,6 +78,7 @@ object RecommenderActor {
   case class RecommendGamesForUser(userId: Int)
   case object AutoTrainModel
   case object EnableAutoTrain
+  case class RecalculateGameRate(gameId: Long)
 
   def props(sparkContext: SparkContext): Props = {
     Props(new RecommenderActor(sparkContext))

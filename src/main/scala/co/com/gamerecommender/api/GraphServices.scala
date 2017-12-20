@@ -1,5 +1,6 @@
 package co.com.gamerecommender.api
 
+import co.com.gamerecommender.actor.RecommenderActor.RecalculateGameRate
 import co.com.gamerecommender.model._
 import co.com.gamerecommender.repository.GraphRepository
 
@@ -35,6 +36,7 @@ trait GraphServices extends Services {
 
   def giveRateToGame(username: String, relationRequest: GameRateRequest): Future[RelationResult] = Future {
     val result = GraphRepository.rateGame(username, relationRequest.gameId, relationRequest.rate)
+    recommenderActor ! RecalculateGameRate(relationRequest.gameId)
     result
   }
 

@@ -10,12 +10,10 @@ import org.neo4j.driver.v1._
 
 import scala.collection.JavaConverters._
 
-sealed trait GraphRepository {
+sealed trait GraphRepository extends Neo4jRepository {
 
   protected val defaultZone: ZoneId = Clock.systemDefaultZone().getZone
   protected val formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-
-  val neoDriver: Driver
 
   def getGamesIn(gamesIds: Seq[Long]): Seq[Game]
 
@@ -29,32 +27,9 @@ sealed trait GraphRepository {
 
   def rateGame(username: String, gameId: Long, rate: Double): RelationResult
 
-  protected def executeReadTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
-    val session = neoDriver.session()
-    val result: T = session.readTransaction(createTransactionWork[T](query, applyFun))
-    result
-  }
+  def getGameAverageRating(gameId: Long): Double
 
-  protected def executeWriteTx[T](query: Statement, applyFun: (StatementResult) => T): T = {
-    val session = neoDriver.session()
-    val result: T = session.writeTransaction(createTransactionWork[T](query, applyFun))
-    result
-  }
-
-  private def createTransactionWork[T](query: Statement, applyFun: (StatementResult) => T): TransactionWork[T] = {
-    new TransactionWork[T]() {
-      override def execute(transaction: Transaction): T = {
-        val stResult: StatementResult = transaction.run(query)
-        applyFun(stResult)
-      }
-    }
-  }
-
-  protected def executeQuery(query: Statement): StatementResult = {
-    val session = neoDriver.session()
-    val result = session.run(query)
-    result
-  }
+  def updateGameRate(gameId: Long, rate: Double): Unit
 
   protected def getDateFormattedFromMillis(timeMillis: Long): String = {
 
@@ -210,6 +185,48 @@ object GraphRepository extends GraphRepository {
 
     val result: RelationResult = executeWriteTx(statement, applyFuncToLike)
     result
+
+  }
+
+  override def getGameAverageRating(gameId: Long): Double = {
+    val params = Map[String, Object](
+      "gameId" -> Long.box(gameId))
+    val getRateQuery =
+      """
+        |MATCH(g:GAME)
+        |where id(g) = {gameId}
+        |MATCH(:USER)-[r:RATES]->(g)
+        |RETURN SUM(r.rate)/count(r) as currentRate
+      """.stripMargin
+
+    val statement = new Statement(getRateQuery, params.asJava)
+
+    val resultRate = executeQuery(statement)
+
+    resultRate.single().get("currentRate").asDouble()
+
+  }
+
+  override def updateGameRate(gameId: Long, rate: Double): Unit = {
+    val params = Map[String, Object](
+      "gameId" -> Long.box(gameId),
+      "currentRate" -> Double.box(rate))
+
+    val updateQuery =
+      """
+        |MATCH(g:GAME)
+        |where id(g) = {gameId}
+        |SET g.rate = round(10.0^1 * {currentRate} )/10.0^1
+        |RETURN g.rate as rate
+      """.stripMargin
+
+    val updateStatement = new Statement(updateQuery, params.asJava)
+
+    val applyFuncToUpdate: StatementResult => Double = (res: StatementResult) => {
+      res.single().get("rate").asDouble()
+    }
+
+    executeWriteTx(updateStatement, applyFuncToUpdate)
 
   }
 

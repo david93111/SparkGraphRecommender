@@ -3,6 +3,7 @@ Version 0.3.1
 + Merge strategy for relations to avoid duplication and manage statuses directly on nodes
 + Improvement over date management with milliseconds of relations
 + Minor simplification on graph repository
++ Auto update for game rate after user rating
 
 Version 0.3.0
 ---------------------
